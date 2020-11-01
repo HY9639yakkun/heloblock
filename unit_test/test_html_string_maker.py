@@ -23,6 +23,32 @@ class HeadingTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             hm.Heading(0, "0以下なら検証に引っかかる")
 
+    def test_append(self):
+        obj = hm.Heading(5, "appendが動作したらエラー")
+        with self.assertRaises(Exception):
+            obj.append([hm.Heading(5, "appendが動作したらエラー")])
+
+
+class BodyTest(unittest.TestCase):
+    def test_Body(self):
+        obj = hm.Body()
+        self.assertEqual("<body>\r\n</body>", obj.make_string())
+
+    def test_append(self):
+        obj = hm.Body()
+        obj.append([hm.Heading(1, "テスト")])
+        self.assertEqual("<body>\r\n<h1>テスト</h1>\r\n</body>", obj.make_string())
+
+    def test_append2(self):
+        obj = hm.Body()
+        obj.append([hm.Heading(1, "テスト1"), hm.Heading(2, "テスト2")])
+        obj.append([hm.Heading(3, "テスト3")])
+        self.assertEqual(
+            "<body>\r\n"
+            "<h1>テスト1</h1>\r\n<h2>テスト2</h2>\r\n<h3>テスト3</h3>"
+            "\r\n</body>",
+            obj.make_string())
+
 
 if __name__ == '__main__':
     unittest.main()
