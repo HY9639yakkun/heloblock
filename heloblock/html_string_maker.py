@@ -3,13 +3,10 @@ from abc import ABCMeta, abstractmethod
 LINE_FEED_CODE = "\r\n"
 
 
-def sandwich_with_tags(tag, text):
-    return f"<{tag}>{text}</{tag}>"
-
-
 # インターフェース
 class BaseHtmlString(metaclass=ABCMeta):
-    def __init__(self):
+    def __init__(self, tag):
+        self.__tag = tag
         self.children = []  # BaseHtmlString into list
 
     @abstractmethod
@@ -25,18 +22,19 @@ class BaseHtmlString(metaclass=ABCMeta):
         """
         self.children.extend(children)
 
+    def _sandwich_with_tags(self, text):
+        return f"<{self.__tag }>{text}</{self.__tag }>"
+
 
 # ############################################################
 class Heading(BaseHtmlString):
     def __init__(self, num: int, text: str):
         assert 0 < num < 7
-        self.__num = num
         self.__text = text
-        super(Heading, self).__init__()
+        super(Heading, self).__init__(f"h{num}")
 
     def make_string(self) -> str:
-        tag = f"h{self.__num}"
-        return sandwich_with_tags(tag, self.__text)
+        return self._sandwich_with_tags(self.__text)
 
     def append(self, children: list):
         raise Exception("can not use")
@@ -45,10 +43,10 @@ class Heading(BaseHtmlString):
 # ############################################################
 class Body(BaseHtmlString):
     def __init__(self):
-        super(Body, self).__init__()
+        super(Body, self).__init__("body")
 
     def make_string(self) -> str:
-        return sandwich_with_tags("body", self.__make_string_for_children())
+        return self._sandwich_with_tags(self.__make_string_for_children())
 
     def __make_string_for_children(self):
         if len(self.children) == 0:
