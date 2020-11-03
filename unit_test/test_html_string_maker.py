@@ -3,6 +3,13 @@ import unittest
 import heloblock.html_string_maker as hm
 
 
+class TextTest(unittest.TestCase):
+    # タグ無しのテキスト
+    def test_Heading1(self):
+        obj = hm.Text("テスト")
+        self.assertEqual("テスト", obj.make_string())
+
+
 class HeadingTest(unittest.TestCase):
     def test_Heading1(self):
         obj = hm.Heading(1, "テスト")
@@ -48,6 +55,18 @@ class BodyTest(unittest.TestCase):
             "<h1>テスト1</h1>\r\n<h2>テスト2</h2>\r\n<h3>テスト3</h3>"
             "\r\n</body>",
             obj.make_string())
+
+
+class Division(unittest.TestCase):
+    def test_Body(self):
+        obj = hm.Division()
+        self.assertEqual("<div>\r\n</div>", obj.make_string())
+
+    def test_set_class(self):
+        obj = hm.Division()
+        obj.set_class("test_class")
+        obj.append([hm.Text("テスト")])
+        self.assertEqual('<div class="test_class">\r\nテスト\r\n</div>', obj.make_string())
 
 
 if __name__ == '__main__':
