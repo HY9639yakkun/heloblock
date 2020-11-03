@@ -31,6 +31,15 @@ class SandwichWithTagsWithClass(SandwichWithTags):
         return f'<{self._tag} class="{self.__html_class_name}">{text}</{self._tag}>'
 
 
+class SandwichWithTagsWithId(SandwichWithTags):
+    def __init__(self, tag, html_id_name):
+        self.__html_id_name = html_id_name
+        super(SandwichWithTagsWithId, self).__init__(tag)
+
+    def sandwich_with_tags(self, text: str) -> str:
+        return f'<{self._tag} id="{self.__html_id_name}">{text}</{self._tag}>'
+
+
 # 基盤クラス
 class BaseHtmlString(IMakeString):
     def __init__(self, tag):
@@ -41,6 +50,10 @@ class BaseHtmlString(IMakeString):
     def set_class(self, html_class_name) -> None:
         # 処理の切り替えを実行
         self.__sandwich = SandwichWithTagsWithClass(self.__tag, html_class_name)
+
+    def set_id(self, html_id_name) -> None:
+        # 処理の切り替えを実行
+        self.__sandwich = SandwichWithTagsWithId(self.__tag, html_id_name)
 
     def make_string(self) -> str:
         """

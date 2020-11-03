@@ -68,6 +68,12 @@ class Division(unittest.TestCase):
         obj.append([hm.Text("テスト")])
         self.assertEqual('<div class="test_class">\r\nテスト\r\n</div>', obj.make_string())
 
+    def test_set_id(self):
+        obj = hm.Division()
+        obj.set_id("test_id")
+        obj.append([hm.Text("テスト")])
+        self.assertEqual('<div id="test_id">\r\nテスト\r\n</div>', obj.make_string())
+
 
 if __name__ == '__main__':
     unittest.main()
