@@ -44,7 +44,10 @@ class BodyTest(unittest.TestCase):
     def test_append(self):
         obj = hm.Body()
         obj.append([hm.Heading(1, "テスト")])
-        self.assertEqual("<body>\r\n<h1>テスト</h1>\r\n</body>", obj.make_string())
+        self.assertEqual(
+            "<body>\r\n"
+            "    <h1>テスト</h1>\r\n"
+            "</body>", obj.make_string())
 
     def test_append2(self):
         obj = hm.Body()
@@ -52,12 +55,14 @@ class BodyTest(unittest.TestCase):
         obj.append([hm.Heading(3, "テスト3")])
         self.assertEqual(
             "<body>\r\n"
-            "<h1>テスト1</h1>\r\n<h2>テスト2</h2>\r\n<h3>テスト3</h3>"
-            "\r\n</body>",
+            "    <h1>テスト1</h1>\r\n"
+            "    <h2>テスト2</h2>\r\n"
+            "    <h3>テスト3</h3>\r\n"
+            "</body>",
             obj.make_string())
 
 
-class Division(unittest.TestCase):
+class DivisionTest(unittest.TestCase):
     def test_Body(self):
         obj = hm.Division()
         self.assertEqual("<div>\r\n</div>", obj.make_string())
@@ -66,13 +71,19 @@ class Division(unittest.TestCase):
         obj = hm.Division()
         obj.set_class("test_class")
         obj.append([hm.Text("テスト")])
-        self.assertEqual('<div class="test_class">\r\nテスト\r\n</div>', obj.make_string())
+        self.assertEqual(
+            '<div class="test_class">\r\n'
+            '    テスト\r\n'
+            '</div>', obj.make_string())
 
     def test_set_id(self):
         obj = hm.Division()
         obj.set_id("test_id")
         obj.append([hm.Text("テスト")])
-        self.assertEqual('<div id="test_id">\r\nテスト\r\n</div>', obj.make_string())
+        self.assertEqual(
+            '<div id="test_id">\r\n'
+            '    テスト\r\n'
+            '</div>', obj.make_string())
 
 
 if __name__ == '__main__':

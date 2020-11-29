@@ -2,7 +2,10 @@ from abc import ABCMeta, abstractmethod
 
 LINE_FEED_CODE = "\r\n"
 
+INDENT = "    "
 
+
+# ##############################################
 # インターフェース
 class IMakeString(metaclass=ABCMeta):
     @abstractmethod
@@ -13,6 +16,23 @@ class IMakeString(metaclass=ABCMeta):
         pass
 
 
+# ##############################################
+# インデントを深くする
+class Indent(object):
+    def __init__(self):
+        self._indent_depth = 0
+
+    def set_indent_depth(self, value: int):
+        self._indent_depth = value
+
+    def get_child_indent_depth(self):
+        return self._indent_depth+1
+
+    def get_indent(self):
+        return INDENT * self._indent_depth
+
+
+# ##############################################
 # タグでテキストを挟む処理 の移譲先
 class SandwichWithTags(object):
     def __init__(self, tag):
@@ -40,12 +60,22 @@ class SandwichWithTagsWithId(SandwichWithTags):
         return f'<{self._tag} id="{self.__html_id_name}">{text}</{self._tag}>'
 
 
+# ##############################################
 # 基盤クラス
-class BaseHtmlString(IMakeString):
+class BaseHtmlString(IMakeString, Indent):
     def __init__(self, tag):
+        super(BaseHtmlString, self).__init__()
         self.__tag = tag
         self.children = []  # BaseHtmlString into list
         self.__sandwich = SandwichWithTags(tag)  # デフォルトの処理
+
+    def set_indent_depth_to_children(self):
+        if len(self.children) == 0:
+            return
+
+        child_indent_depth = self.get_child_indent_depth()
+        for child in self.children:
+            child.set_indent_depth(child_indent_depth)
 
     def set_class(self, html_class_name) -> None:
         # 処理の切り替えを実行
@@ -59,7 +89,9 @@ class BaseHtmlString(IMakeString):
         """
         出力する文字列の作成
         """
-        return self._sandwich_with_tags(self.__make_string_for_children())
+        self.set_indent_depth_to_children()
+        result = self.__make_string_for_children()
+        return self.get_indent() + self._sandwich_with_tags(result)
 
     def __make_string_for_children(self):
         if len(self.children) == 0:
@@ -80,12 +112,16 @@ class BaseHtmlString(IMakeString):
 
 
 # ############################################################
-class Text(IMakeString):
+# 各タグごとの動作
+# ############################################################
+# ############################################################
+class Text(IMakeString, Indent):
     def __init__(self, text: str):
+        super(Text, self).__init__()
         self.__text = text
 
     def make_string(self) -> str:
-        return self.__text
+        return self.get_indent() + self.__text
 
 
 # ############################################################
@@ -96,7 +132,7 @@ class Heading(BaseHtmlString):
         super(Heading, self).__init__(f"h{num}")
 
     def make_string(self) -> str:
-        return self._sandwich_with_tags(self.__text)
+        return self.get_indent() + self._sandwich_with_tags(self.__text)
 
     def append(self, children: list):
         raise Exception("can not use")
