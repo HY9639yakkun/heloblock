@@ -1,8 +1,10 @@
 from abc import ABCMeta, abstractmethod
 
-LINE_FEED_CODE = "\r\n"
+from typing import List
 
-INDENT = "    "
+LINE_FEED_CODE: str = "\r\n"
+
+INDENT: str = "    "
 
 
 # ##############################################
@@ -19,32 +21,40 @@ class IMakeString(metaclass=ABCMeta):
 # ##############################################
 # インデントを深くする
 class Indent(object):
-    def __init__(self):
-        self._indent_depth = 0
+    """インデントを作る"""
 
-    def set_indent_depth(self, value: int):
+    def __init__(self):
+        self._indent_depth: int = 0
+
+    def set_indent_depth(self, value: int) -> None:
         self._indent_depth = value
 
-    def get_child_indent_depth(self):
-        return self._indent_depth+1
+    def get_child_indent_depth(self) -> int:
+        """子のインデントの深さを作成(自身のインデントの深さ+1)"""
+        return self._indent_depth + 1
 
-    def get_indent(self):
+    def get_indent(self) -> str:
+        """自身のインデント作成"""
         return INDENT * self._indent_depth
 
 
 # ##############################################
 # タグでテキストを挟む処理 の移譲先
 class SandwichWithTags(object):
-    def __init__(self, tag):
-        self._tag = tag
+    """タグで挟む"""
+
+    def __init__(self, tag: str):
+        self._tag: str = tag
 
     def sandwich_with_tags(self, text: str) -> str:
         return f"<{self._tag}>{text}</{self._tag}>"
 
 
 class SandwichWithTagsWithClass(SandwichWithTags):
-    def __init__(self, tag, html_class_name):
-        self.__html_class_name = html_class_name
+    """class付き"""
+
+    def __init__(self, tag: str, html_class_name: str):
+        self.__html_class_name: str = html_class_name
         super(SandwichWithTagsWithClass, self).__init__(tag)
 
     def sandwich_with_tags(self, text: str) -> str:
@@ -52,8 +62,10 @@ class SandwichWithTagsWithClass(SandwichWithTags):
 
 
 class SandwichWithTagsWithId(SandwichWithTags):
-    def __init__(self, tag, html_id_name):
-        self.__html_id_name = html_id_name
+    """id付き"""
+
+    def __init__(self, tag: str, html_id_name: str):
+        self.__html_id_name: str = html_id_name
         super(SandwichWithTagsWithId, self).__init__(tag)
 
     def sandwich_with_tags(self, text: str) -> str:
@@ -63,17 +75,19 @@ class SandwichWithTagsWithId(SandwichWithTags):
 # ##############################################
 # 基盤クラス
 class BaseHtmlString(IMakeString, Indent):
-    def __init__(self, tag):
+    def __init__(self, tag: str):
         super(BaseHtmlString, self).__init__()
-        self.__tag = tag
-        self.children = []  # BaseHtmlString into list
-        self.__sandwich = SandwichWithTags(tag)  # デフォルトの処理
+        self.__tag: str = tag
+        self.children: List[BaseHtmlString] = []
+        self.__sandwich: SandwichWithTags = SandwichWithTags(tag)  # デフォルトの処理
 
-    def set_indent_depth_to_children(self):
+    def set_indent_depth_to_children(self) -> None:
+        """このオブジェクトのインデントを下げる"""
         if len(self.children) == 0:
             return
 
-        child_indent_depth = self.get_child_indent_depth()
+        child_indent_depth: int = self.get_child_indent_depth()
+        child: BaseHtmlString
         for child in self.children:
             child.set_indent_depth(child_indent_depth)
 
@@ -116,9 +130,11 @@ class BaseHtmlString(IMakeString, Indent):
 # ############################################################
 # ############################################################
 class Text(IMakeString, Indent):
+    """テキスト(最小単位。子は持たない)"""
+
     def __init__(self, text: str):
         super(Text, self).__init__()
-        self.__text = text
+        self.__text: str = text
 
     def make_string(self) -> str:
         return self.get_indent() + self.__text
@@ -126,6 +142,8 @@ class Text(IMakeString, Indent):
 
 # ############################################################
 class Heading(BaseHtmlString):
+    """h"""
+
     def __init__(self, num: int, text: str):
         assert 0 < num < 7
         self.__text = text
@@ -140,11 +158,19 @@ class Heading(BaseHtmlString):
 
 # ############################################################
 class Body(BaseHtmlString):
+    """body"""
+
     def __init__(self):
         super(Body, self).__init__("body")
 
 
 # ############################################################
 class Division(BaseHtmlString):
+    """div"""
+
     def __init__(self):
         super(Division, self).__init__("div")
+
+# ############################################################
+# HTML FILE
+# ############################################################
